@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedConnect AI - Interconnected Swimlane Diagram</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            overflow: auto;
+        }
+        
+        .diagram-container {
+            background: white;
+            border: 2px solid #2c5aa0;
+            min-width: 1800px;
+            min-height: 1200px;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c5aa0;
+            padding: 15px;
+            border-bottom: 2px solid #2c5aa0;
+            background: linear-gradient(135deg, #e8f4f8, #f0f8ff);
+        }
+        
+        .swimlane {
+            display: flex;
+            border-bottom: 1px solid #666;
+            min-height: 140px;
+            position: relative;
+        }
+        
+        .swimlane:last-child {
+            border-bottom: 2px solid #333;
+        }
+        
+        .lane-header {
+            width: 160px;
+            background: linear-gradient(135deg, #2c5aa0, #4a7bc8);
+            color: white;
+            padding: 8px;
+            font-weight: bold;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 2px solid #333;
+            font-size: 12px;
+            writing-mode: horizontal-tb;
+        }
+        
+        .lane-content {
+            flex: 1;
+            padding: 8px;
+            background: #fafafa;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            min-height: 120px;
+        }
+        
+        .activity-box {
+            background: #e8f4f8;
+            border: 1.5px solid #2c5aa0;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 10px;
+            text-align: center;
+            min-width: 90px;
+            max-width: 130px;
+            position: relative;
+            word-wrap: break-word;
+            line-height: 1.2;
+        }
+        
+        .activity-title {
+            font-weight: bold;
+            color: #1a365d;
+            margin-bottom: 2px;
+        }
+        
+        .activity-details {
+            color: #4a5568;
+            font-size: 9px;
+            font-style: italic;
+        }
+        
+        .decision-diamond {
+            width: 70px;
+            height: 70px;
+            background: #fff2cc;
+            border: 2px solid #d6b656;
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+            position: relative;
+        }
+        
+        .decision-text {
+            transform: rotate(-45deg);
+            font-size: 9px;
+            font-weight: bold;
+            text-align: center;
+            width: 50px;
+        }
+        
+        .ai-enhanced {
+            background: linear-gradient(135deg, #fed7d7, #fbb6ce);
+            border-color: #e53e3e;
+            color: #742a2a;
+        }
+        
+        .ai-enhanced .activity-title {
+            color: #742a2a;
+        }
+        
+        .alert-box {
+            background: #fff5b4;
+            border: 2px solid #d69e2e;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 5px #d69e2e; }
+            to { box-shadow: 0 0 15px #d69e2e, 0 0 20px #d69e2e; }
+        }
+        
+        .start-end-node {
+            background: #c6f6d5;
+            border: 2px solid #38a169;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: bold;
+            color: #22543d;
+        }
+        
+        .connection-arrow {
+            position: absolute;
+            z-index: 10;
+        }
+        
+        .arrow-line {
+            stroke: #2c5aa0;
+            stroke-width: 2;
+            marker-end: url(#arrowhead);
+        }
+        
+        .arrow-dashed {
+            stroke-dasharray: 5,5;
+        }
+        
+        .data-flow {
+            stroke: #e53e3e;
+            stroke-width: 2;
+            stroke-dasharray: 3,3;
+            marker-end: url(#datahead);
+        }
+        
+        .flow-label {
+            font-size: 8px;
+            fill: #2c5aa0;
+            font-weight: bold;
+        }
+        
+        .integration-hub {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+            border: 2px solid #4a5568;
+            border-radius: 12px;
+            padding: 8px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #2d3748;
+            min-width: 120px;
+        }
+        
+        .sync-point {
+            background: #000;
+            width: 4px;
+            height: 30px;
+            margin: 0 10px;
+        }
+        
+        .parallel-gateway {
+            background: #fff;
+            border: 3px solid #000;
+            width: 40px;
+            height: 40px;
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 5px;
+        }
+        
+        .gateway-plus {
+            transform: rotate(-45deg);
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .note-box {
+            background: #ffffcc;
+            border: 1px dashed #999;
+            padding: 4px;
+            font-size: 8px;
+            font-style: italic;
+            max-width: 100px;
+            position: absolute;
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.95);
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 9px;
+            max-width: 250px;
+        }
+        
+        .legend-title {
+            font-weight: bold;
+            color: #2c5aa0;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 4px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 3px 0;
+            gap: 6px;
+        }
+        
+        .legend-symbol {
+            width: 20px;
+            height: 12px;
+            border: 1px solid;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="diagram-container">
+        <!-- SVG for arrows and connections -->
+        <svg width="100%" height="100%" style="position: absolute; top: 0; left: 0; pointer-events: none;">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                        refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#2c5aa0" />
+                </marker>
+                <marker id="datahead" markerWidth="10" markerHeight="7" 
+                        refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#e53e3e" />
+                </marker>
+            </defs>
+            
+            <!-- Vertical flow arrows between lanes -->
+            <line x1="200" y1="120" x2="200" y2="180" class="arrow-line" />
+            <text x="205" y="150" class="flow-label">Registration Data</text>
+            
+            <line x1="400" y1="180" x2="400" y2="240" class="data-flow" />
+            <text x="405" y="210" class="flow-label">AI Triage</text>
+            
+            <line x1="600" y1="240" x2="600" y2="300" class="arrow-line" />
+            <text x="605" y="270" class="flow-label">Referral</text>
+            
+            <line x1="800" y1="300" x2="800" y2="360" class="data-flow" />
+            <text x="805" y="330" class="flow-label">Booking Confirm</text>
+            
+            <line x1="1000" y1="360" x2="1000" y2="420" class="arrow-line" />
+            <text x="1005" y="390" class="flow-label">Results</text>
+            
+            <line x1="1200" y1="420" x2="1200" y2="480" class="data-flow" />
+            <text x="1205" y="450" class="flow-label">Scheduling</text>
+            
+            <!-- Horizontal flows within lanes -->
+            <line x1="300" y1="200" x2="450" y2="200" class="arrow-line" />
+            <line x1="500" y1="260" x2="650" y2="260" class="data-flow" />
+            <line x1="700" y1="320" x2="850" y2="320" class="arrow-line" />
+            
+            <!-- Cross-lane communications -->
+            <path d="M 350 180 Q 400 120 450 180" stroke="#e53e3e" stroke-width="2" 
+                  stroke-dasharray="3,3" fill="none" marker-end="url(#datahead)" />
+            <text x="400" y="140" class="flow-label">AI Matching</text>
+            
+            <path d="M 650 240 Q 700 200 750 240" stroke="#2c5aa0" stroke-width="2" 
+                  fill="none" marker-end="url(#arrowhead)" />
+            <text x="700" y="210" class="flow-label">Triage Response</text>
+        </svg>
+        
+        <div class="title">MedConnect AI - Integrated Care Orchestration Platform</div>
+        
+        <!-- Lane 1: Patients & Carers -->
+        <div class="swimlane">
+            <div class="lane-header">«Lane»<br>Patients & Carers</div>
+            <div class="lane-content">
+                <div class="start-end-node">START</div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Register / Profile</div>
+                    <div class="activity-details">(Consent, Intake, Uploads)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Login (MFA/SSO)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Search Providers</div>
+                    <div class="activity-details">(Specialty, Location, Wait-times, Reviews, Languages, Transport)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Receive Welcome Pack</div>
+                    <div class="activity-details">(Directions, Parking, Costs, Questionnaires)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Complete Intake, Consent, Pre/Post-op Questionnaires</div>
+                </div>
+                
+                <div class="decision-diamond">
+                    <div class="decision-text">Cancel/ Reschedule?</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Contact-free Check-in</div>
+                    <div class="activity-details">(QR/Kiosk on Day)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Attend Appointment / Procedure</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">View Results & Post-op Plan</div>
+                    <div class="activity-details">(Meds, Wound Care, Exercises, Red Flags)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lane 2: GPs & Family Clinics -->
+        <div class="swimlane">
+            <div class="lane-header">«Lane»<br>GPs & Family Clinics</div>
+            <div class="lane-content">
+                <div class="activity-box">
+                    <div class="activity-title">AuthN/AuthZ (MFA, SSO, Biometrics, RBAC)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Authenticate</div>
+                </div>
+                
+                <div class="activity-box ai-enhanced">
+                    <div class="activity-title">Create e-Referral</div>
+                    <div class="activity-details">(Auto-check: vitals, provisional dx, scans)</div>
+                </div>
+                
+                <div class="activity-box ai-enhanced">
+                    <div class="activity-title">Missing-info checks</div>
+                </div>
+                
+                <div class="activity-box ai-enhanced">
+                    <div class="activity-title">Best-match Specialists</div>
+                    <div class="activity-details">(Specialty, Billing, Reviews, Languages, Transport)</div>
+                </div>
+                
+                <div class="activity-box ai-enhanced">
+                    <div class="activity-title">Check live calendars</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Send Referral</div>
+                    <div class="activity-details">(Reserve first open slot)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Respond to Triage Queries</div>
+                    <div class="activity-details">(Structured Task Queue)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Follow Patient Progress</div>
+                    <div class="activity-details">(Results/Discharge to Inbox)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lane 3: MCA Core Services & AI -->
+        <div class="swimlane">
+            <div class="lane-header">«Lane»<br>MCA Core Services & Datastores</div>
+            <div class="lane-content">
+                <div class="activity-box ai-enhanced">
+                    <div class="activity-title">AI Triage & Orchestration</div>
+                    <div class="activity-details">(Predictive Urgency, Best-match)</div>
+                </div>
+                
+                <div class="activity-box ai-enhanced">
+                    <div class="activity-title">AI Governance Gate</div>
+                    <div class="activity-details">(Risk Thresholds, Bias Checks, TGA Change Mgmt, Human-in-the-loop)</div>
+                </div>
+                
+                <div class="decision-diamond">
+                    <div class="decision-text">Auto-accept below threshold?</div>
+                </div>
+                
+                <div class="activity-box alert-box">
+                    <div class="activity-title">Human review required</div>
+                </div>
+                
+                <div class="activity-box ai-enhanced">
+                    <div class="activity-title">Auto-accept permitted</div>
+                </div>
+                
+                <div class="integration-hub">
+                    Integration Hub<br>
+                    (REST/GraphQL, HL7 FHIR, Webhooks)
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">EMR/PACS/LIS/MyHR</div>
+                </div>
+                
+                <div class="activity-box ai-enhanced">
+                    <div class="activity-title">Analytics & Dashboards</div>
+                    <div class="activity-details">(Utilisation, KPIs, PROMS/PREMS)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Dashboards</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lane 4: Specialists & Surgeons -->
+        <div class="swimlane">
+            <div class="lane-header">«Lane»<br>Specialists & Surgeons</div>
+            <div class="lane-content">
+                <div class="activity-box">
+                    <div class="activity-title">Authenticate</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Triage Inbox</div>
+                    <div class="activity-details">(Urgent=Red, Med=Amber, Routine=Green)</div>
+                </div>
+                
+                <div class="decision-diamond">
+                    <div class="decision-text">Accept / Forward / Request Info?</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Accept</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Forward</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Request info</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Propose Appointment</div>
+                    <div class="activity-details">(Confirm Booking)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Update Care Plan & Notes</div>
+                    <div class="activity-details">(Operative/Discharge summaries)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Assign Tasks to Registrars/Fellows</div>
+                    <div class="activity-details">(Track completion)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lane 5: Diagnostic Providers -->
+        <div class="swimlane">
+            <div class="lane-header">«Lane»<br>Diagnostic Providers</div>
+            <div class="lane-content">
+                <div class="activity-box">
+                    <div class="activity-title">Expose Real-time Slots</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Book diagnostic slot</div>
+                </div>
+                
+                <div class="activity-box ai-enhanced">
+                    <div class="activity-title">Urgency parse</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Perform Test</div>
+                    <div class="activity-details">(Voice-to-text, Terminology checks)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Upload Results</div>
+                    <div class="activity-details">(PDF, DICOM, HL7)</div>
+                </div>
+                
+                <div class="activity-box alert-box">
+                    <div class="activity-title">→ Alerts to GP/Patient</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Utilisation & Turnaround Time</div>
+                </div>
+                
+                <div class="activity-box alert-box">
+                    <div class="activity-title">Alerts → GP & Patient</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lane 6: Hospitals & Day-Procedure Centres -->
+        <div class="swimlane">
+            <div class="lane-header">«Lane»<br>Hospitals & Day-Procedure Centres</div>
+            <div class="lane-content">
+                <div class="activity-box">
+                    <div class="activity-title">Scheduling & Rostering</div>
+                    <div class="activity-details">(Calendars, Theatre, Beds)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Theatre/Beds/Rosters</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Verify Pre-admission Complete</div>
+                    <div class="activity-details">(Tests, Imaging, Consents)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Document & Consent</div>
+                    <div class="activity-details">(Forms, e-Sign, DICOM/PDF/HL7)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Consents/Pre-op forms</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Theatre Control Dashboard</div>
+                    <div class="activity-details">(Prep, Induction, Incision, Closure, Cleaning)</div>
+                </div>
+                
+                <div class="decision-diamond">
+                    <div class="decision-text">Delay > 10 min?</div>
+                </div>
+                
+                <div class="activity-box alert-box">
+                    <div class="activity-title">Notify Floor Coordinator</div>
+                    <div class="activity-details">(Redeploy staff / Swap cases)</div>
+                </div>
+                
+                <div class="decision-diamond">
+                    <div class="decision-text">Case Cancelled?</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Backfill Slot</div>
+                    <div class="activity-details">(Waitlist with checks complete)</div>
+                </div>
+                
+                <div class="activity-box alert-box">
+                    <div class="activity-title">Same-day backfill</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Log Events & Adverse Events</div>
+                    <div class="activity-details">(Time-out, Specimens, Implants, TGA notify)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Recovery & Transfer Checklist</div>
+                    <div class="activity-details">(Pain, Airway, EBL)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Compile Discharge Packet</div>
+                    <div class="activity-details">(Meds, Follow-ups, Home-care)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">KPIs & Accreditation</div>
+                    <div class="activity-details">(Wheels-in/out, On-time starts, Unplanned stays, 30d readmits, TAT, Theatre utilisation)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lane 7: MCA Administrators & Staff -->
+        <div class="swimlane">
+            <div class="lane-header">«Lane»<br>MCA Administrators & Staff</div>
+            <div class="lane-content">
+                <div class="activity-box">
+                    <div class="activity-title">Configure Templates & RBAC</div>
+                    <div class="activity-details">(Org Policies)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">RBAC & Policies</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Monitor System Queues</div>
+                    <div class="activity-details">(Stalled referrals/overdue reports)</div>
+                </div>
+                
+                <div class="activity-box alert-box">
+                    <div class="activity-title">Escalation Workflows</div>
+                    <div class="activity-details">(Alerts/Tasks)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Data Retention & Audit-log Reviews</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Audit & Compliance</div>
+                    <div class="activity-details">(Privacy Act 1988, MyHR, TGA)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Audit & retention</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Manage Integrations</div>
+                    <div class="activity-details">(EMR, Finance, Identity)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Upgrades, Usage Analytics</div>
+                    <div class="activity-details">(Financials, AI accuracy)</div>
+                </div>
+                
+                <div class="activity-box">
+                    <div class="activity-title">Insights & usage metrics</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Data flow annotations -->
+        <div class="note-box" style="top: 200px; left: 250px;">
+            Cancel triggers reallocation
+        </div>
+        
+        <div class="note-box" style="top: 260px; left: 450px;">
+            Triage queries
+        </div>
+        
+        <div class="note-box" style="top: 320px; left: 650px;">
+            Offer freed slot
+        </div>
+        
+        <div class="note-box" style="top: 380px; left: 850px;">
+            Sync to GP & Hospital Records
+        </div>
+        
+        <div class="note-box" style="top: 440px; left: 1050px;">
+            Results/Discharge summaries
+        </div>
+        
+        <div class="note-box" style="top: 500px; left: 1250px;">
+            Prereq checks
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-title">Legend & Key Flows</div>
+            <div class="legend-item">
+                <div class="legend-symbol" style="background: #e8f4f8; border-color: #2c5aa0;"></div>
+                <span>Standard Process</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-symbol" style="background: #fed7d7; border-color: #e53e3e;"></div>
+                <span>AI-Enhanced Process</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-symbol" style="background: #fff5b4; border-color: #d69e2e;"></div>
+                <span>Alert/Notification</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-symbol" style="background: #e2e8f0; border-color: #4a5568;"></div>
+                <span>Integration Hub</span>
+            </div>
+            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ccc;">
+                <strong>Key Integrations:</strong><br>
+                • AHPRA/Medicare PRODA Authentication<br>
+                • My Health Record Sync<br>
+                • EMR/PACS/LIS Integration<br>
+                • TGA Compliance Monitoring<br>
+                • Real-time Resource Orchestration
+            </div>
+        </div>
+    </div>
+</body>
+</html>
